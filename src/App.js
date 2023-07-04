@@ -5,27 +5,25 @@ import Footer from "./components/Footer";
 import Tasks from "./components/Tasks";
 import AddTask from "./components/AddTask";
 import About from "./components/About";
+import useHttp from "./hoooks/useHttp";
 
 function App() {
   const [isShowAdd, setIsShowAdd] = useState(false);
   const [tasks, setTasks] = useState([]);
+  const { request } = useHttp("http://localhost:5000/");
 
   const deleteTask = async (id) => {
-    await fetch(`http://localhost:5000/tasks/${id}`, {
+    await request(`tasks/${id}`, {
       method: "DELETE",
     });
     setTasks(tasks.filter((task) => task.id !== id));
   };
 
   const toggleReminder = async (id) => {
-    const taskFromServer = await fetchTask(id);
-    await fetch(`http://localhost:5000/tasks/${id}`, {
+    const taskFromServer = await request(`tasks/${id}`);
+    await request(`tasks/${id}`, {
       method: "PUT",
-      headers: { "Content-type": "application/json" },
-      body: JSON.stringify({
-        ...taskFromServer,
-        reminder: !taskFromServer.reminder,
-      }),
+      body: { ...taskFromServer, reminder: !taskFromServer.reminder },
     });
 
     setTasks(
@@ -36,34 +34,23 @@ function App() {
   };
 
   const addTask = async (task) => {
-    const res = await fetch("http://localhost:5000/tasks", {
+    const res = await request("tasks", {
       method: "POST",
-      headers: { "Content-type": "application/json" },
-      body: JSON.stringify(task),
+      body: task,
     });
 
-    const newTask = await res.json();
+    const newTask = res;
     setTasks([...tasks, newTask]);
-  };
-
-  const fetchTasks = async () => {
-    const res = await fetch("http://localhost:5000/tasks");
-    return await res.json();
-  };
-
-  const fetchTask = async (id) => {
-    const res = await fetch(`http://localhost:5000/tasks/${id}`);
-    return await res.json();
   };
 
   useEffect(() => {
     const getTasksFromServer = async () => {
-      const fetchedTasks = await fetchTasks();
+      const fetchedTasks = await request("tasks");
       setTasks(fetchedTasks);
     };
 
     getTasksFromServer();
-  }, []);
+  }, [request]);
 
   return (
     <Router>

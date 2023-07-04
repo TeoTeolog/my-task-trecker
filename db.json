@@ -13,9 +13,9 @@
       "reminder": true
     },
     {
-      "text": "Add Date Time Validation",
-      "day": "Wed 5th at 6:00pm",
-      "reminder": false,
+      "text": "jopa Popa",
+      "day": "friday",
+      "reminder": true,
       "id": 3
     }
   ]
